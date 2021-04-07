@@ -8,10 +8,11 @@ from conection import conexion
 # conexion.commit()
 # conexion.close()
 
-route = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
+routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
+routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
 
 def companies():
-    xmlReader = minidom.parse(route + "Companies.xml")
+    xmlReader = minidom.parse(routeMD + "Companies.xml")
     companies = xmlReader.getElementsByTagName("company")
     i = 0
     for company in companies:
@@ -42,7 +43,7 @@ def companies():
     return
 
 def sources():
-    xmlReader = minidom.parse(route + "Sources.xml")
+    xmlReader = minidom.parse(routeMD + "Sources.xml")
     sources = xmlReader.getElementsByTagName("source")
     i = 0
     for source in sources:
@@ -82,7 +83,7 @@ def sources():
     return
 
 def persons():
-    xmlReader = minidom.parse(route + "Persons.xml")
+    xmlReader = minidom.parse(routeMD + "Persons.xml")
     sources = xmlReader.getElementsByTagName("person")
     i = 0
     for source in sources:
@@ -96,22 +97,42 @@ def persons():
         i += 1
         if len(source.getAttribute("companyId")) == 0:
             company_id = "00000000-0000-0000-0000-000000000000"
+        # insert = "insert into person(person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
+        # datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
+        # print("%s, id: %s company: %s,"%(i, person_id, company_id))
+        # cursor1.execute(insert, datos)
+        # conexion.commit()
+    print("deben ser 381 y salen -> %s" % i)
+    return
+
+def dataEntryBy():
+    """Esta funcion no sirve de nada OMITIR"""
+    xmlReader = minidom.parse(routeMD + "0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.spold")
+    sources = xmlReader.getElementsByTagName("dataEntryBy")
+    i = 0
+    for source in sources:
+        person_id = source.getAttribute("personId")
+        is_active_author = source.getAttribute("isActiveAuthor")
+
+        i += 1
+        if len(source.getAttribute("companyId")) == 0:
+            company_id = "00000000-0000-0000-0000-000000000000"
         # print(f"%s id: %s comment: %s sourceType: %s year: %s volumeNo: %s firstAuthor: %s additionalAuthors: %s title: %s namesOfEditors: %s shortName: %s pageNumbers: %s journal: %s titleOfAnthology: %s placeOfPublications: %s publisher: %s" % (i, id, comment, sourceType, year, volumeNo, firstAuthor, additionalAuthors, title, namesOfEditors, shortName, pageNumbers, journal, titleOfAnthology, placeOfPublications, publisher))
         # print(f"id %d: UUID: %s code: %s website: %s name: %s comment: %s" % (i, id, code, website, name, comment))
         # print("id: %d %d" % (i, len(company.getElementsByTagName("comment"))))
         insert = "insert into person(person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
-        datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
+        datos = (person_id, is_active_author)
         # print("%s, id: %s company: %s,"%(i, person_id, company_id))
-        cursor1.execute(insert, datos)
-        conexion.commit()
+        # cursor1.execute(insert, datos)
+        # conexion.commit()
     print("deben ser 381 y salen -> %s" % i)
     return
 
 if __name__ == "__main__":
-    cursor1 = conexion.cursor()
+    # cursor1 = conexion.cursor()
     # companies()
     # sources()
-    persons()
-
-    conexion.close()
+    # persons()
+    dataEntryBy()
+    # conexion.close()
     print()
