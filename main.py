@@ -93,35 +93,25 @@ def persons():
         person_telefax = source.getAttribute("telefax")
         person_email = source.getAttribute("email")
         company_id = source.getAttribute("companyId")
-
         i += 1
-        if len(source.getElementsByTagName("comment")) != 0:
-            try:
-                aux = ""
-                comment = ""
-                j = 0
-                for comm in source.getElementsByTagName("comment"):
-                    aux = source.getElementsByTagName("comment")[j].firstChild.nodeValue
-                    comment = comment + '_' + aux
-                    j += 1
-            except AttributeError:
-                comment = "not comment provided by the provider"
-        else:
-            comment = "not comment provided by the provider"
+        if len(source.getAttribute("companyId")) == 0:
+            company_id = "00000000-0000-0000-0000-000000000000"
         # print(f"%s id: %s comment: %s sourceType: %s year: %s volumeNo: %s firstAuthor: %s additionalAuthors: %s title: %s namesOfEditors: %s shortName: %s pageNumbers: %s journal: %s titleOfAnthology: %s placeOfPublications: %s publisher: %s" % (i, id, comment, sourceType, year, volumeNo, firstAuthor, additionalAuthors, title, namesOfEditors, shortName, pageNumbers, journal, titleOfAnthology, placeOfPublications, publisher))
         # print(f"id %d: UUID: %s code: %s website: %s name: %s comment: %s" % (i, id, code, website, name, comment))
         # print("id: %d %d" % (i, len(company.getElementsByTagName("comment"))))
-        # insert = "insert into source(source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        # datos = (source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment)
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
+        insert = "insert into person(person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
+        datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
+        # print("%s, id: %s company: %s,"%(i, person_id, company_id))
+        cursor1.execute(insert, datos)
+        conexion.commit()
     print("deben ser 381 y salen -> %s" % i)
     return
 
 if __name__ == "__main__":
-    # cursor1 = conexion.cursor()
+    cursor1 = conexion.cursor()
     # companies()
     # sources()
     persons()
-    # conexion.close()
+
+    conexion.close()
     print()
