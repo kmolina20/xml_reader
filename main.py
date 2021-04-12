@@ -128,11 +128,71 @@ def dataEntryBy():
     print("deben ser 381 y salen -> %s" % i)
     return
 
+def activity_name():
+    xmlReader = minidom.parse(routeMD + "ActivityNames.xml")
+    activity_names = xmlReader.getElementsByTagName("activityName")
+    i = 0
+    for activity_name in activity_names:
+        activity_name_id = activity_name.getAttribute("id")
+        i += 1
+        if len(activity_name.getElementsByTagName("name")) != 0:
+            try:
+                activity_name = activity_name.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                activity_name = "not name provided by the provider"
+        else:
+            activity_name = "not name provided by the provider"
+        # insert = "insert into activity_name(activity_name_id, activity_name) values (%s, %s)"
+        # datos = (activity_name_id, activity_name)
+        # print("%s, id: %s activity_name: %s,"%(i, activity_name_id, activity_name))
+        # cursor1.execute(insert, datos)
+        # conexion.commit()
+    print("deben ser 7485 y salen -> %s" % i)
+    return
+
+def geography():
+    xmlReader = minidom.parse(routeMD + "Geographies.xml")
+    geographies = xmlReader.getElementsByTagName("geography")
+    i = 0
+    for geography in geographies:
+        geography_id = geography.getAttribute("id")
+        longitude = geography.getAttribute("longitude")
+        latitude = geography.getAttribute("latitude")
+        un_code = geography.getAttribute("uNCode")
+        un_region_code = geography.getAttribute("uNRegionCode")
+        un_subregion_code = geography.getAttribute("uNSubregionCode")
+        i += 1
+        if len(geography.getElementsByTagName("name")) != 0:
+            try:
+                name = geography.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                name = "not name provided by the provider"
+        else:
+            name = "not name provided by the provider"
+
+        if len(geography.getElementsByTagName("shortname")) != 0:
+            try:
+                short_name = geography.getElementsByTagName("shortname")[0].firstChild.data
+            except AttributeError:
+                short_name = "not shortname provided by the provider"
+        else:
+            short_name = "not shortname provided by the provider"
+        # insert = "insert into geography(geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name) values (%s, %s, %s, %s, %s, %s, %s, %s)"
+        # datos = (geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name)
+        # # print("%s, id: %s geography: %s,"%(i, geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name))
+        # print("%s, id: %s "%(i, geography_id))
+        # cursor1.execute(insert, datos)
+        # conexion.commit()
+    print("deben ser 479 y salen -> %s" % i)
+    return
+
 if __name__ == "__main__":
     # cursor1 = conexion.cursor()
     # companies()
     # sources()
     # persons()
-    dataEntryBy()
+    # activity_name()
+    # geography()
     # conexion.close()
+
     print()
