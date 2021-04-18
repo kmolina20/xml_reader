@@ -35,11 +35,11 @@ def companies():
                 comment = "not comment provided by the provider"
         else:
             comment = "not comment provided by the provider"
-        # insert = "insert into company(company_id, company_code, company_name, website, comment) values (%s,%s,%s,%s,%s)"
-        # datos = (id, code, name, website, comment)
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
-    # print("deben ser 167 y salen -> %s" % i)
+        insert = "insert into company(id, code, name, website, comment) values (%s,%s,%s,%s,%s)"
+        datos = (id, code, name, website, comment)
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser 167 y salen -> %s" % i)
     return
 
 def sources():
@@ -75,11 +75,11 @@ def sources():
                 comment = "not comment provided by the provider"
         else:
             comment = "not comment provided by the provider"
-        # insert = "insert into source(source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        # datos = (source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment)
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
-    # print("deben ser 1275 y salen -> %s" % i)
+        insert = "insert into source(id, type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        datos = (source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment)
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser 1275 y salen -> %s" % i)
     return
 
 def persons():
@@ -97,11 +97,11 @@ def persons():
         i += 1
         if len(source.getAttribute("companyId")) == 0:
             company_id = "00000000-0000-0000-0000-000000000000"
-        # insert = "insert into person(person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
-        # datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
-        # print("%s, id: %s company: %s,"%(i, person_id, company_id))
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
+        insert = "insert into person(id, name, email, address, telephone, telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
+        datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
+        print("%s, id: %s company: %s,"%(i, person_id, company_id))
+        cursor1.execute(insert, datos)
+        conexion.commit()
     print("deben ser 381 y salen -> %s" % i)
     return
 
@@ -142,11 +142,11 @@ def activity_name():
                 activity_name = "not name provided by the provider"
         else:
             activity_name = "not name provided by the provider"
-        # insert = "insert into activity_name(activity_name_id, activity_name) values (%s, %s)"
-        # datos = (activity_name_id, activity_name)
-        # print("%s, id: %s activity_name: %s,"%(i, activity_name_id, activity_name))
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
+        insert = "insert into activity_name(id, activity_name) values (%s, %s)"
+        datos = (activity_name_id, activity_name)
+        print("%s, id: %s activity_name: %s,"%(i, activity_name_id, activity_name))
+        cursor1.execute(insert, datos)
+        conexion.commit()
     print("deben ser 7485 y salen -> %s" % i)
     return
 
@@ -177,22 +177,110 @@ def geography():
                 short_name = "not shortname provided by the provider"
         else:
             short_name = "not shortname provided by the provider"
-        # insert = "insert into geography(geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name) values (%s, %s, %s, %s, %s, %s, %s, %s)"
-        # datos = (geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name)
-        # # print("%s, id: %s geography: %s,"%(i, geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name))
-        # print("%s, id: %s "%(i, geography_id))
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
+        insert = "insert into geography(id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name) values (%s, %s, %s, %s, %s, %s, %s, %s)"
+        datos = (geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name)
+        # print("%s, id: %s geography: %s,"%(i, geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name))
+        print("%s, id: %s "%(i, geography_id))
+        cursor1.execute(insert, datos)
+        conexion.commit()
     print("deben ser 479 y salen -> %s" % i)
     return
 
+def unit():
+    xmlReader = minidom.parse(routeMD + "Units.xml")
+    units = xmlReader.getElementsByTagName("unit")
+    i = 0
+    for unit in units:
+        unit_id = unit.getAttribute("id")
+        i += 1
+        if len(unit.getElementsByTagName("name")) != 0:
+            try:
+                unit_name = unit.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                unit_name = "not name provided by the provider"
+        else:
+            unit_name = "not name provided by the provider"
+        if len(unit.getElementsByTagName("comment")) != 0:
+            try:
+                unit_comment = unit.getElementsByTagName("comment")[0].firstChild.data
+            except AttributeError:
+                unit_comment = "not comment provided by the provider"
+        else:
+            unit_comment = "not comment provided by the provider"
+        insert = "insert into unit(id, name, comment) values (%s, %s, %s)"
+        datos = (unit_id, unit_name, unit_comment)
+        print("%s, id: %s unit_name: %s,"%(i, unit_id, unit_name))
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser 124 y salen -> %s" % i)
+    return
+
+def system_model():
+    xmlReader = minidom.parse(routeMD + "SystemModels.xml")
+    systemModels = xmlReader.getElementsByTagName("systemModel")
+    i = 0
+    for systemModel in systemModels:
+        unit_id = systemModel.getAttribute("id")
+        i += 1
+        if len(systemModel.getElementsByTagName("name")) != 0:
+            try:
+                system_model_name = systemModel.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                system_model_name = "not name provided by the provider"
+        else:
+            system_model_name = "not name provided by the provider"
+        if len(systemModel.getElementsByTagName("shortname")) != 0:
+            try:
+                system_model_short_name = systemModel.getElementsByTagName("shortname")[0].firstChild.data
+            except AttributeError:
+                system_model_short_name = "not shortname provided by the provider"
+        else:
+            system_model_short_name = "not shortname provided by the provider"
+        insert = "insert into system_model(id, name, short_name) values (%s, %s, %s)"
+        datos = (unit_id, system_model_name, system_model_short_name)
+        print("%s, id: %s system_model_name: %s,"%(i, unit_id, system_model_name))
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser 10 y salen -> %s" % i)
+    return
+
+def property():
+    xmlReader = minidom.parse(routeMD + "Properties.xml")
+    properties = xmlReader.getElementsByTagName("property")
+    i = 0
+    for property in properties:
+        property_id = property.getAttribute("id")
+        default_variable_name = property.getAttribute("defaultVariableName")
+        unit_id = property.getAttribute("unitId")
+        i += 1
+        if len(property.getAttribute("unitId")) == 0:
+            unit_id = "00000000-0000-0000-0000-000000000000"
+        if len(property.getElementsByTagName("name")) != 0:
+            try:
+                property_name = property.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                property_name = "not name provided by the provider"
+        else:
+            property_name = "not name provided by the provider"
+        insert = "insert into property(id, unit_id, default_variable_name, name) values (%s, %s, %s, %s)"
+        datos = (property_id, unit_id, property_name, default_variable_name)
+        print("%s, id: %s property_name: %s,"%(i, property_id, property_name))
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser 947 y salen -> %s" % i)
+    return
+
 if __name__ == "__main__":
-    # cursor1 = conexion.cursor()
+    cursor1 = conexion.cursor()
     # companies()
     # sources()
     # persons()
     # activity_name()
     # geography()
-    # conexion.close()
+    # unit()
+    # system_model()
+    # property()
 
-    print()
+    conexion.close()
+
+    # print("")
