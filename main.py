@@ -1,5 +1,6 @@
 from xml.dom import minidom
 from conection import conexion
+import os
 
 # cursor1=conexion.cursor()
 # sql="insert into articulos(descripcion, precio) values (%s,%s)"
@@ -270,8 +271,87 @@ def property():
     print("deben ser 947 y salen -> %s" % i)
     return
 
+def activityIndexEntry():
+    xmlReader = minidom.parse(routeMD + "ActivityIndex.xml")
+    activityIndexEntry = xmlReader.getElementsByTagName("activityIndexEntry")
+    version = "ecoinvent 3.6_cut-off_ecoSpold02"
+    i = 0
+    for activityIndex in activityIndexEntry:
+        id = activityIndex.getAttribute("id")
+        activity_name_id = activityIndex.getAttribute("activityNameId")
+        geography_id = activityIndex.getAttribute("geographyId")
+        start_date = activityIndex.getAttribute("startDate")
+        end_date = activityIndex.getAttribute("endDate")
+        special_activity_type = activityIndex.getAttribute("specialActivityType")
+        system_model_id = activityIndex.getAttribute("systemModelId")
+        i += 1
+
+        insert = "insert into activity_index(id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version) values (%s, %s, %s, %s, %s, %s, %s, %s)"
+        datos = (id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version)
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser +19999 (19749) y salen -> %s" % i)
+    return
+
+def select():
+    select = "SELECT * FROM activity_index where id='00093951-0c71-4a74-96d8-ece56003838a' ORDER BY id ASC;"
+    cursor1.execute(select)
+
+def leerActividad():
+    # os.rename(routeDS + "New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.spold", routeDS+"New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.xml")
+    xmlReader = minidom.parse(routeDS+"New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.xml")
+    activityDescriptions = xmlReader.getElementsByTagName("activityDescription")
+    i = 0
+    j = 1
+    for activityDescription in activityDescriptions:
+        for activity in activityDescription.getElementsByTagName("activity"):
+            activity_index_id = activity.getAttribute("id")
+            if len(activity.getElementsByTagName("allocationComment")) != 0:
+                try:
+                    property_name = property.getElementsByTagName("allocationComment")[0].firstChild.data
+                except AttributeError:
+                    property_name = "not allocationComment provided by the provider"
+            else:
+                property_name = "not allocationComment provided by the provider"
+            for generalComment in activity.getElementsByTagName("generalComment"):
+                for text in generalComment.getElementsByTagName("text"):
+                    print(generalComment.getElementsByTagName("text")[j].firstChild.data)
+                    # print("index: %s" % text.getAttribute("index"))
+
+                    # # print(len(generalComment.getElementsByTagName("text")))
+                    # for k in str(len(generalComment.getElementsByTagName("text"))):
+                    #     if (text.getAttribute("index") == str(1)):
+                    #         print(generalComment.getElementsByTagName("text")[int(k)].firstChild.data)
+                    #         print("k: %s" % k)
+                    j += 1
+                    print("j: %s" % (j-1))
+
+        # property_id = property.getAttribute("id")
+        # default_variable_name = property.getAttribute("defaultVariableName")
+        # unit_id = property.getAttribute("unitId")
+        # i += 1
+        # if len(property.getAttribute("unitId")) == 0:
+        #     unit_id = "00000000-0000-0000-0000-000000000000"
+        # if len(property.getElementsByTagName("name")) != 0:
+        #     try:
+        #         property_name = property.getElementsByTagName("name")[0].firstChild.data
+        #     except AttributeError:
+        #         property_name = "not name provided by the provider"
+        # else:
+        #     property_name = "not name provided by the provider"
+        # insert = "insert into property(id, unit_id, default_variable_name, name) values (%s, %s, %s, %s)"
+        # datos = (property_id, unit_id, property_name, default_variable_name)
+        # print("%s, id: %s property_name: %s," % (i, property_id, property_name))
+        # cursor1.execute(insert, datos)
+        # conexion.commit()
+    # print("deben ser 947 y salen -> %s" % i)
+    return
+
 if __name__ == "__main__":
     cursor1 = conexion.cursor()
+    # activityIndexEntry()
+    # select()
+    leerActividad()
     # companies()
     # sources()
     # persons()
