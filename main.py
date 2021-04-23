@@ -1,6 +1,8 @@
+from builtins import print
 from xml.dom import minidom
 from conection import conexion
 import os
+import numpy as np
 
 # cursor1=conexion.cursor()
 # sql="insert into articulos(descripcion, precio) values (%s,%s)"
@@ -293,65 +295,193 @@ def activityIndexEntry():
     print("deben ser +19999 (19749) y salen -> %s" % i)
     return
 
-def select():
-    select = "SELECT * FROM activity_index where id='00093951-0c71-4a74-96d8-ece56003838a' ORDER BY id ASC;"
-    cursor1.execute(select)
+def intermediateExchange():
+    xmlReader = minidom.parse(routeMD + "IntermediateExchanges.xml")
+    intermediateExchanges = xmlReader.getElementsByTagName("intermediateExchange")
+    i = 0
+    for intermediateExchange in intermediateExchanges:
+        id = intermediateExchange.getAttribute("id")
+        unit_id = intermediateExchange.getAttribute("unitId")
+        i += 1
+        if len(intermediateExchange.getElementsByTagName("name")) != 0:
+            try:
+                name = intermediateExchange.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                name = "not name provided by the provider"
+        else:
+            name = "not name provided by the provider"
+        if len(intermediateExchange.getElementsByTagName("name")) != 0:
+            try:
+                name = intermediateExchange.getElementsByTagName("name")[0].firstChild.data
+            except AttributeError:
+                name = "not name provided by the provider"
+        else:
+            name = "not name provided by the provider"
+        insert = "insert into intermediate_exchange(id, unit_id, name) values (%s, %s, %s)"
+        datos = (id, unit_id, name)
+        cursor1.execute(insert, datos)
+        conexion.commit()
+    print("deben ser 3205 y salen -> %s" % i)
+    return
 
 def leerActividad():
     # os.rename(routeDS + "New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.spold", routeDS+"New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.xml")
     xmlReader = minidom.parse(routeDS+"New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.xml")
     activityDescriptions = xmlReader.getElementsByTagName("activityDescription")
     i = 0
-    j = 1
-    for activityDescription in activityDescriptions:
-        for activity in activityDescription.getElementsByTagName("activity"):
-            activity_index_id = activity.getAttribute("id")
-            if len(activity.getElementsByTagName("allocationComment")) != 0:
-                try:
-                    property_name = property.getElementsByTagName("allocationComment")[0].firstChild.data
-                except AttributeError:
-                    property_name = "not allocationComment provided by the provider"
-            else:
-                property_name = "not allocationComment provided by the provider"
-            for generalComment in activity.getElementsByTagName("generalComment"):
-                for text in generalComment.getElementsByTagName("text"):
-                    print(generalComment.getElementsByTagName("text")[j].firstChild.data)
-                    # print("index: %s" % text.getAttribute("index"))
+    k = 1
+    # for activityDescription in activityDescriptions:
+    #     for activity in activityDescription.getElementsByTagName("activity"):
+    #         activity_index_id = activity.getAttribute("id")
+    #         if len(activity.getElementsByTagName("allocationComment")) != 0:
+    #             try:
+    #                 allocation_comment = property.getElementsByTagName("allocationComment")[0].firstChild.data
+    #             except AttributeError:
+    #                 allocation_comment = "not allocationComment provided by the provider"
+    #         else:
+    #             allocation_comment = "not allocationComment provided by the provider"
+    #         included_processes = "includedActivitiesStart" +activity.getElementsByTagName("includedActivitiesStart")[0].firstChild.data
+    #         included_processes = included_processes + "includedActivitiesEnd" + activity.getElementsByTagName("includedActivitiesEnd")[0].firstChild.data
+    #
+    #         for generalComment in activity.getElementsByTagName("generalComment"):
+    #             # for text in generalComment.getElementsByTagName("text"):
+    #             matriz = []
+    #             array = np.array([[], []])
+    #             for text in generalComment.getElementsByTagName("text"):
+    #                 filas = len(generalComment.getElementsByTagName("text"))
+    #                 columnas = 2
+    #                 for j in range(columnas):
+    #                     # print("j %s" % j)
+    #                     if (j == 0):
+    #                         a = str(text.getAttribute("index"))
+    #                     if (j == 1):
+    #                         # b = "hola"
+    #                         b = str(generalComment.getElementsByTagName("text")[i].firstChild.data)
+    #                 i += 1
+    #                 array2 = np.array([[a],[b]])
+    #                 newArray = np.append(array,array2, axis = 1)
+    #                 matriz.append(array2)
+    #                 # print(newArray)
+    #             # print(matriz[8][1])
+    #             # print(matriz)
+    #             # print(len(matriz))
+    #     # ordena(matriz)
+    #             # for j in str(len(matriz)):
+    #             # #     m += 1
+    #             # #     print("m %s" % m)
+    #             # #     print("j %s" % j)
+    #             #     if matriz[m][0] == '1':
+    #             #         print("a")
+    #             # #         text = "algo"
+    #             # #         # text = text + "\n" + str(matriz[m][1])
+    #             # #         m = 0
+    #             # #         j = 0
+    #             # #         print(text)
+    #             # print("nada")
+    #
 
-                    # # print(len(generalComment.getElementsByTagName("text")))
-                    # for k in str(len(generalComment.getElementsByTagName("text"))):
-                    #     if (text.getAttribute("index") == str(1)):
-                    #         print(generalComment.getElementsByTagName("text")[int(k)].firstChild.data)
-                    #         print("k: %s" % k)
-                    j += 1
-                    print("j: %s" % (j-1))
+    # administrativeInformations = xmlReader.getElementsByTagName("administrativeInformation")
+    # for administrativeInformation in administrativeInformations:
+    #     for dataGeneratorAndPublication in administrativeInformation.getElementsByTagName(
+    #             "dataGeneratorAndPublication"):
+    #         personName = dataGeneratorAndPublication.getAttribute("personName")
+    #         source_id = dataGeneratorAndPublication.getAttribute("publishedSourceId")
+    #         is_copyright_protected = dataGeneratorAndPublication.getAttribute("isCopyrightProtected")
+    #         '''obtener el id de la persona en base al nombre dado los diferentes id's por las versiones'''
+    #         select = "SELECT id FROM person where name='" + personName + "';"
+    #         cursor1.execute(select)
+    #         person_id = cursor1.fetchall()
+    #         '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+    #         insert = "insert into data_generator_and_publication(person_id, source_id, is_copyright_protected) values (%s, %s, %s)"
+    #         datos = (person_id[0], source_id, is_copyright_protected)
+    #         cursor1.execute(insert, datos)
+    #         conexion.commit()
 
-        # property_id = property.getAttribute("id")
-        # default_variable_name = property.getAttribute("defaultVariableName")
-        # unit_id = property.getAttribute("unitId")
-        # i += 1
-        # if len(property.getAttribute("unitId")) == 0:
-        #     unit_id = "00000000-0000-0000-0000-000000000000"
-        # if len(property.getElementsByTagName("name")) != 0:
-        #     try:
-        #         property_name = property.getElementsByTagName("name")[0].firstChild.data
-        #     except AttributeError:
-        #         property_name = "not name provided by the provider"
-        # else:
-        #     property_name = "not name provided by the provider"
-        # insert = "insert into property(id, unit_id, default_variable_name, name) values (%s, %s, %s, %s)"
-        # datos = (property_id, unit_id, property_name, default_variable_name)
-        # print("%s, id: %s property_name: %s," % (i, property_id, property_name))
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
-    # print("deben ser 947 y salen -> %s" % i)
+    #     for timePeriod in activityDescription.getElementsByTagName("timePeriod"):
+    #         is_data_valid_for_entire_period = timePeriod.getAttribute("isDataValidForEntirePeriod")
+    #     for technology in activityDescription.getElementsByTagName("technology"):
+    #         for comment in technology.getElementsByTagName("comment"):
+    #             comment_technology = comment.getElementsByTagName("text")[0].firstChild.data
+    #     select = "SELECT MAX(id) AS id FROM data_generator_and_publication"
+    #     cursor1.execute(select)
+    #     data_generator_and_publication = cursor1.fetchall()
+    #       insert = "insert into activity(activity_index_id, allocation_comment, included_processes, comment_technology, is_data_valid_for_entire_period, data_generator_and_publication_id) values (%s, %s, %s, %s, %s, %s)"
+    #     # datos = (activity_index_id, allocation_comment, included_processes, comment_technology, is_data_valid_for_entire_period, data_generator_and_publication[0])
+    #     # print("%s, id: %s property_name: %s," % (i, property_id, property_name))
+    # flowDatas = xmlReader.getElementsByTagName("flowData")
+    # for flowData in flowDatas:
+    #     for intermediateExchange in flowData.getElementsByTagName("intermediateExchange"):
+    #         id = intermediateExchange.getAttribute("id")
+    #         intermediate_exchange_id = intermediateExchange.getAttribute("intermediateExchangeId")
+    #         variable_name = intermediateExchange.getAttribute("variableName")
+    #         i += 1
+    #         '''debe buscar el ultimo id ingresado, ahora se manda el 1 pero debe buscar el ultimo id ingresado enla tabla activity'''
+    #         select = "SELECT MAX(id) AS id FROM activity"
+    #         cursor1.execute(select)
+    #         activity_id = cursor1.fetchall()
+    #         # insert = "insert into acitivity_intermediate_exchange(id, activity_id, intermediate_exchange_id, variable_name) values (%s, %s, %s, %s)"
+    #         # datos = (id, activity_id[0], intermediate_exchange_id, variable_name)
+    #         # cursor1.execute(insert, datos)
+    #         # conexion.commit()
+    # # print("deben ser 15 y salen -> %s" % i)
+    i = 0 #contador para comprabar la cantidad que se ingresa en la tabla
+    modellingAndValidations = xmlReader.getElementsByTagName("modellingAndValidation")
+    for modellingAndValidation in modellingAndValidations:
+        for review in modellingAndValidation.getElementsByTagName("review"):
+            reviewerName = review.getAttribute("reviewerName")
+            '''obtener el id de la persona en base al nombre dado los diferentes id's por las versiones'''
+            select = "SELECT id FROM person where name='"+reviewerName+"';"
+            cursor1.execute(select)
+            person_id = cursor1.fetchall()
+            person_id2 = "".join(map(str, person_id[0]))
+            # print(person_id2)
+            '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+
+            '''buscar el ultimo id de activity ingresado'''
+            select = "SELECT MAX(id) AS id FROM activity"
+            cursor1.execute(select)
+            activity_id = cursor1.fetchall()
+            activity_id2 = "".join(map(str, activity_id[0]))
+            '''validar si ya se agregaron esos dos id's dado qei puede repetirse por ser varias veces revisor pero solo nos importa uan vez a nosotros'''
+            select = "SELECT person_id, activity_id FROM activity_person where person_id='"+person_id2+"' and activity_id='"+activity_id2+"';"
+            cursor1.execute(select)
+            verifica = cursor1.fetchall()
+            # print(len(verifica))
+            if len(verifica) == 0:
+                insert = "insert into activity_person(person_id, activity_id) values (%s, %s)"
+                datos = (person_id[0], activity_id[0])
+                cursor1.execute(insert, datos)
+            # else:
+            #     print("ya existe")
+            conexion.commit()
+            i += 1
+    print("deben ser 16 y salen -> %s" % i)
     return
+
+def ordena(matriz):
+    m = 0
+    for j in str(len(matriz)):
+        print("m %s" % m)
+        print("j %s" % j)
+        if '1' in matriz[m][0]:
+            print("a")
+            print(matriz[m][0])
+            ordena(matriz)
+    #         text = "algo"
+    #         # text = text + "\n" + str(matriz[m][1])
+    #         m = 0
+    #         j = 0
+    #         print(text)
+        m += 1
+    # print("nada")
+
 
 if __name__ == "__main__":
     cursor1 = conexion.cursor()
     # activityIndexEntry()
     # select()
     leerActividad()
+    # intermediateExchange()
     # companies()
     # sources()
     # persons()
