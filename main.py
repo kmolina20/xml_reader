@@ -287,12 +287,16 @@ def activityIndexEntry():
         special_activity_type = activityIndex.getAttribute("specialActivityType")
         system_model_id = activityIndex.getAttribute("systemModelId")
         i += 1
-
-        insert = "insert into activity_index(id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version) values (%s, %s, %s, %s, %s, %s, %s, %s)"
-        datos = (id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version)
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser +19999 (19749) y salen -> %s" % i)
+        '''obtener los rows que ya han sido ingresados para comprobar que no se repita pero que si esten todos'''
+        select = "SELECT * FROM activity_index where id='" + id + "' and activity_name_id='"+activity_name_id+"' and geography_id='"+geography_id+"' and start_date='"+start_date+"' and end_date='"+end_date+"' and special_activity_type='"+special_activity_type+"' and system_model_id='"+system_model_id+"';"
+        cursor1.execute(select)
+        activity_index = cursor1.fetchall()
+        if len(activity_index) == 0:
+            insert = "insert into activity_index(id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version) values (%s, %s, %s, %s, %s, %s, %s, %s)"
+            datos = (id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version)
+            cursor1.execute(insert, datos)
+            conexion.commit()
+    print("deben ser 35708 y salen -> %s" % i)
     return
 
 def intermediateExchange():
@@ -324,12 +328,28 @@ def intermediateExchange():
     print("deben ser 3205 y salen -> %s" % i)
     return
 
+def ordenamientoBurbuja(matriz,tam):
+    for i in range(1,tam):
+        for j in range(0,tam-i):
+            if(int(matriz[j][0]) > int(matriz[j+1][0])):
+                n = matriz[j+1][0]
+                o = matriz[j+1][1]
+                matriz[j+1][0] = matriz[j][0]
+                matriz[j+1][1] = matriz[j][1]
+                matriz[j][0] = n
+                matriz[j][1] = o
+
 def leerActividad():
+    """data_generator_and_publication - activity - acitivity_intermediate_exchange - activity_person"""
     # os.rename(routeDS + "New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.spold", routeDS+"New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.xml")
-    xmlReader = minidom.parse(routeDS+"New folder/0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.xml")
+    # os.rename(routeDS + "New folder/0a3b32da-3a5d-4ece-98b7-2c30fa78be34_66c93e71-f32b-4591-901c-55395db5c132.spold", routeDS+"New folder/0a3b32da-3a5d-4ece-98b7-2c30fa78be34_66c93e71-f32b-4591-901c-55395db5c132.xml")
+    # os.rename(routeDS + "New folder/0b5c13c7-820e-47d3-aa39-ed2fb6612ec3_9cdb112b-0d90-4d76-9cec-412b0c67d8bb.spold", routeDS+"New folder/0b5c13c7-820e-47d3-aa39-ed2fb6612ec3_9cdb112b-0d90-4d76-9cec-412b0c67d8bb.xml")
+    # os.rename(routeDS + "New folder/0b818f0b-39a8-45a8-a1b1-a3b791e1b1c6_7566f905-29c9-45d6-b2ff-65980f38e3a0.spold", routeDS+"New folder/0b818f0b-39a8-45a8-a1b1-a3b791e1b1c6_7566f905-29c9-45d6-b2ff-65980f38e3a0.xml")
+    xmlReader = minidom.parse(routeDS+"New folder/0b818f0b-39a8-45a8-a1b1-a3b791e1b1c6_7566f905-29c9-45d6-b2ff-65980f38e3a0.xml")
     activityDescriptions = xmlReader.getElementsByTagName("activityDescription")
     i = 0
-    k = 1
+    general_comment = ""
+    print("for activityDescription in activityDescriptions:")
     for activityDescription in activityDescriptions:
         for activity in activityDescription.getElementsByTagName("activity"):
             activity_index_id = activity.getAttribute("id")
@@ -341,79 +361,71 @@ def leerActividad():
             else:
                 allocation_comment = "not allocationComment provided by the provider"
             included_processes = "includedActivitiesStart" +activity.getElementsByTagName("includedActivitiesStart")[0].firstChild.data
-            included_processes = included_processes + "includedActivitiesEnd" + activity.getElementsByTagName("includedActivitiesEnd")[0].firstChild.data
-            '''generalComment es una variable de la tabla activity - falta ordenar, ahora solo esta agregado en una matriz todos los text'''
+            """VALIDAR CUANDO NO TENGA UN END -check-"""
+            if len(activity.getElementsByTagName("includedActivitiesEnd")) != 0:
+                included_processes = included_processes + "includedActivitiesEnd" + activity.getElementsByTagName("includedActivitiesEnd")[0].firstChild.data
+            '''ORDENAMIENTO DE generalComment -check-'''
             for generalComment in activity.getElementsByTagName("generalComment"):
-                # for text in generalComment.getElementsByTagName("text"):
                 matriz = []
-                array = np.array([[], []])
                 for text in generalComment.getElementsByTagName("text"):
                     filas = len(generalComment.getElementsByTagName("text"))
                     columnas = 2
                     for j in range(columnas):
-                        # print("j %s" % j)
                         if (j == 0):
                             a = str(text.getAttribute("index"))
                         if (j == 1):
-                            # b = "hola"
                             b = str(generalComment.getElementsByTagName("text")[i].firstChild.data)
                     i += 1
-                    array2 = np.array([[a],[b]])
-                    newArray = np.append(array,array2, axis = 1)
-                    matriz.append(array2)
-                    # print(newArray)
-                # print(matriz[8][1])
+                    array = np.array([a,b])
+                    matriz.append(array)
                 # print(matriz)
-                # print(len(matriz))
-            # ordena(matriz)
-                # for j in str(len(matriz)):
-                # #     m += 1
-                # #     print("m %s" % m)
-                # #     print("j %s" % j)
-                #     if matriz[m][0] == '1':
-                #         print("a")
-                # #         text = "algo"
-                # #         # text = text + "\n" + str(matriz[m][1])
-                # #         m = 0
-                # #         j = 0
-                # #         print(text)
-                # print("nada")
-
-
+                ordenamientoBurbuja(matriz, len(matriz))
+                # print(matriz)
+                for q in range(0,filas):
+                    general_comment = general_comment + "\n" + matriz[q][1]
+    print("administrativeInformations = xmlReader.getElementsByTagName(administrativeInformation)")
     administrativeInformations = xmlReader.getElementsByTagName("administrativeInformation")
     for administrativeInformation in administrativeInformations:
         for dataGeneratorAndPublication in administrativeInformation.getElementsByTagName("dataGeneratorAndPublication"):
             personName = dataGeneratorAndPublication.getAttribute("personName")
             source_id = dataGeneratorAndPublication.getAttribute("publishedSourceId")
+            if len(dataGeneratorAndPublication.getAttribute("publishedSourceId")) == 0:
+                source_id = "00000000-0000-0000-0000-000000000000"
             is_copyright_protected = dataGeneratorAndPublication.getAttribute("isCopyrightProtected")
             '''obtener el id de la persona en base al nombre dado los diferentes id's por las versiones'''
             select = "SELECT id FROM person where name='" + personName + "';"
             cursor1.execute(select)
             person_id = cursor1.fetchall()
             '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
-
+            if len(person_id) == 0:
+                print("no encuentra nombre->crear nueva 'persona' -> %s" % personName)
             insert = "insert into data_generator_and_publication(person_id, source_id, is_copyright_protected) values (%s, %s, %s)"
             datos = (person_id[0], source_id, is_copyright_protected)
             cursor1.execute(insert, datos)
             conexion.commit()
         for timePeriod in activityDescription.getElementsByTagName("timePeriod"):
             is_data_valid_for_entire_period = timePeriod.getAttribute("isDataValidForEntirePeriod")
+        '''VALIDAR  CIANDO NO HAYA comment_technology - check'''
         for technology in activityDescription.getElementsByTagName("technology"):
-            for comment in technology.getElementsByTagName("comment"):
-                comment_technology = comment.getElementsByTagName("text")[0].firstChild.data
+            if len(technology.getElementsByTagName("comment")) != 0:
+                for comment in technology.getElementsByTagName("comment"):
+                    comment_technology = comment.getElementsByTagName("text")[0].firstChild.data
+            else:
+                comment_technology = "NO COMMENT TECHNOLOGY"
         '''obtener el ultimo id de data_generator_and_publication ingresado en la base'''
         select = "SELECT MAX(id) AS id FROM data_generator_and_publication"
         cursor1.execute(select)
         data_generator_and_publication = cursor1.fetchall()
-        insert = "insert into activity(activity_index_id, allocation_comment, included_processes, comment_technology, is_data_valid_for_entire_period, data_generator_and_publication_id) values (%s, %s, %s, %s, %s, %s)"
-        datos = (activity_index_id, allocation_comment, included_processes, comment_technology, is_data_valid_for_entire_period, data_generator_and_publication[0])
+        insert = "insert into activity(activity_index_id, allocation_comment, general_comment, included_processes, comment_technology, is_data_valid_for_entire_period, data_generator_and_publication_id) values (%s, %s, %s, %s, %s, %s, %s)"
+        datos = (activity_index_id, allocation_comment, general_comment, included_processes, comment_technology, is_data_valid_for_entire_period, data_generator_and_publication[0])
         cursor1.execute(insert, datos)
         conexion.commit()
+    print("flowDatas = xmlReader.getElementsByTagName(flowData)")
     i = 0  # contador para comprabar la cantidad que se ingresa en la tabla
     flowDatas = xmlReader.getElementsByTagName("flowData")
     for flowData in flowDatas:
         for intermediateExchange in flowData.getElementsByTagName("intermediateExchange"):
-            id = intermediateExchange.getAttribute("id")
+            # id = intermediateExchange.getAttribute("id")
             intermediate_exchange_id = intermediateExchange.getAttribute("intermediateExchangeId")
             variable_name = intermediateExchange.getAttribute("variableName")
             i += 1
@@ -421,11 +433,12 @@ def leerActividad():
             select = "SELECT MAX(id) AS id FROM activity"
             cursor1.execute(select)
             activity_id = cursor1.fetchall()
-            insert = "insert into acitivity_intermediate_exchange(id, activity_id, intermediate_exchange_id, variable_name) values (%s, %s, %s, %s)"
-            datos = (id, activity_id[0], intermediate_exchange_id, variable_name)
+            insert = "insert into acitivity_intermediate_exchange(activity_id, intermediate_exchange_id, variable_name) values (%s, %s, %s)"
+            datos = (activity_id[0], intermediate_exchange_id, variable_name)
             cursor1.execute(insert, datos)
             conexion.commit()
-    print("acitivity_intermediate_exchange -> deben ser 15 y salen -> %s" % i)
+    print("acitivity_intermediate_exchange -> deben ser 15-42 y salen -> %s" % i)
+    print("modellingAndValidations = xmlReader.getElementsByTagName(modellingAndValidation)")
     i = 0 #contador para comprabar la cantidad que se ingresa en la tabla
     modellingAndValidations = xmlReader.getElementsByTagName("modellingAndValidation")
     for modellingAndValidation in modellingAndValidations:
@@ -444,7 +457,7 @@ def leerActividad():
             cursor1.execute(select)
             activity_id = cursor1.fetchall()
             activity_id2 = "".join(map(str, activity_id[0]))
-            '''validar si ya se agregaron esos dos id's dado qei puede repetirse por ser varias veces revisor pero solo nos importa uan vez a nosotros'''
+            '''validar si ya se agregaron esos dos id's dado que puede repetirse por ser varias veces revisor pero solo nos importa que se ingrese una vez a nosotros'''
             select = "SELECT person_id, activity_id FROM activity_person where person_id='"+person_id2+"' and activity_id='"+activity_id2+"';"
             cursor1.execute(select)
             verifica = cursor1.fetchall()
@@ -457,30 +470,11 @@ def leerActividad():
             #     print("ya existe")
             conexion.commit()
             i += 1
-    print("activity_person -> deben ser 16 y salen -> %s" % i)
+    print("activity_person -> deben ser 16-16 y salen -> %s" % i)
     return
-
-def ordena(matriz):
-    m = 0
-    for j in str(len(matriz)):
-        print("m %s" % m)
-        print("j %s" % j)
-        if '1' in matriz[m][0]:
-            print("a")
-            print(matriz[m][0])
-            ordena(matriz)
-    #         text = "algo"
-    #         # text = text + "\n" + str(matriz[m][1])
-    #         m = 0
-    #         j = 0
-    #         print(text)
-        m += 1
-    # print("nada")
-
 
 if __name__ == "__main__":
     cursor1 = conexion.cursor()
-    # activityIndexEntry()
     # intermediateExchange()
     # companies()
     # sources()
@@ -490,7 +484,8 @@ if __name__ == "__main__":
     # unit()
     # system_model()
     # property()
-    # leerActividad()
+    # activityIndexEntry()
+    leerActividad()
 
     conexion.close()
 
