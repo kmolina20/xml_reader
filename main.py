@@ -11,10 +11,12 @@ import numpy as np
 # conexion.commit()
 # conexion.close()
 
-routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
-routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
+routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cutoff_ecoSpold02/MasterData/"
+# routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/MasterData/"
+routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/datasets/"
 
 def companies():
+    print("companies")
     xmlReader = minidom.parse(routeMD + "Companies.xml")
     companies = xmlReader.getElementsByTagName("company")
     i = 0
@@ -38,14 +40,22 @@ def companies():
                 comment = "not comment provided by the provider"
         else:
             comment = "not comment provided by the provider"
-        insert = "insert into company(id, code, name, website, comment) values (%s,%s,%s,%s,%s)"
-        datos = (id, code, name, website, comment)
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 167 y salen -> %s" % i)
+        '''obtener el id de la conpania '''
+        select = "SELECT id FROM company where id='" + id + "';"
+        cursor1.execute(select)
+        company_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(company_id) == 0:
+            insert = "insert into company(id, code, name, website, comment) values (%s,%s,%s,%s,%s)"
+            datos = (id, code, name, website, comment)
+            cursor1.execute(insert, datos)
+            conexion.commit()
+        else:
+            print("persona ya existe")
     return
 
 def sources():
+    print("sources")
     xmlReader = minidom.parse(routeMD + "Sources.xml")
     sources = xmlReader.getElementsByTagName("source")
     i = 0
@@ -78,14 +88,20 @@ def sources():
                 comment = "not comment provided by the provider"
         else:
             comment = "not comment provided by the provider"
-        insert = "insert into source(id, type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        datos = (source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment)
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 1275 y salen -> %s" % i)
+        '''obtener el id de los sources '''
+        select = "SELECT id FROM source where id='" + source_id + "';"
+        cursor1.execute(select)
+        select_source_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(source_id) == 0:
+            insert = "insert into source(id, type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            datos = (source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment)
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def persons():
+    print("persons")
     xmlReader = minidom.parse(routeMD + "Persons.xml")
     sources = xmlReader.getElementsByTagName("person")
     i = 0
@@ -100,38 +116,21 @@ def persons():
         i += 1
         if len(source.getAttribute("companyId")) == 0:
             company_id = "00000000-0000-0000-0000-000000000000"
-        insert = "insert into person(id, name, email, address, telephone, telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
-        datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
-        print("%s, id: %s company: %s,"%(i, person_id, company_id))
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 381 y salen -> %s" % i)
-    return
-
-def dataEntryBy():
-    """Esta funcion no sirve de nada OMITIR"""
-    xmlReader = minidom.parse(routeMD + "0122d540-58ed-4a1b-8ce3-8437827cd3ac_71e2f1db-a2c5-44d0-8337-dfff15be974d.spold")
-    sources = xmlReader.getElementsByTagName("dataEntryBy")
-    i = 0
-    for source in sources:
-        person_id = source.getAttribute("personId")
-        is_active_author = source.getAttribute("isActiveAuthor")
-
-        i += 1
-        if len(source.getAttribute("companyId")) == 0:
-            company_id = "00000000-0000-0000-0000-000000000000"
-        # print(f"%s id: %s comment: %s sourceType: %s year: %s volumeNo: %s firstAuthor: %s additionalAuthors: %s title: %s namesOfEditors: %s shortName: %s pageNumbers: %s journal: %s titleOfAnthology: %s placeOfPublications: %s publisher: %s" % (i, id, comment, sourceType, year, volumeNo, firstAuthor, additionalAuthors, title, namesOfEditors, shortName, pageNumbers, journal, titleOfAnthology, placeOfPublications, publisher))
-        # print(f"id %d: UUID: %s code: %s website: %s name: %s comment: %s" % (i, id, code, website, name, comment))
-        # print("id: %d %d" % (i, len(company.getElementsByTagName("comment"))))
-        insert = "insert into person(person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
-        datos = (person_id, is_active_author)
-        # print("%s, id: %s company: %s,"%(i, person_id, company_id))
-        # cursor1.execute(insert, datos)
-        # conexion.commit()
-    print("deben ser 381 y salen -> %s" % i)
+        '''obtener el id de la person '''
+        select = "SELECT id FROM person where id='" + person_id + "';"
+        cursor1.execute(select)
+        select_person_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_person_id) == 0:
+            insert = "insert into person(id, name, email, address, telephone, telefax, company_id) values (%s, %s, %s, %s, %s, %s, %s)"
+            datos = (person_id, person_name, person_email, person_address, person_telephone, person_telefax, company_id)
+            # print("%s, id: %s company: %s,"%(i, person_id, company_id))
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def activity_name():
+    print("activity_name")
     xmlReader = minidom.parse(routeMD + "ActivityNames.xml")
     activity_names = xmlReader.getElementsByTagName("activityName")
     i = 0
@@ -145,15 +144,21 @@ def activity_name():
                 activity_name = "not name provided by the provider"
         else:
             activity_name = "not name provided by the provider"
-        insert = "insert into activity_name(id, activity_name) values (%s, %s)"
-        datos = (activity_name_id, activity_name)
-        print("%s, id: %s activity_name: %s,"%(i, activity_name_id, activity_name))
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 7485 y salen -> %s" % i)
+        '''obtener el id de la activity_name '''
+        select = "SELECT id FROM activity_name where id='" + activity_name_id + "';"
+        cursor1.execute(select)
+        select_activity_name_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_activity_name_id) == 0:
+            insert = "insert into activity_name(id, activity_name) values (%s, %s)"
+            datos = (activity_name_id, activity_name)
+            print("%s, id: %s activity_name: %s,"%(i, activity_name_id, activity_name))
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def geography():
+    print("geography")
     xmlReader = minidom.parse(routeMD + "Geographies.xml")
     geographies = xmlReader.getElementsByTagName("geography")
     i = 0
@@ -180,16 +185,22 @@ def geography():
                 short_name = "not shortname provided by the provider"
         else:
             short_name = "not shortname provided by the provider"
-        insert = "insert into geography(id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name) values (%s, %s, %s, %s, %s, %s, %s, %s)"
-        datos = (geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name)
-        # print("%s, id: %s geography: %s,"%(i, geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name))
-        print("%s, id: %s "%(i, geography_id))
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 479 y salen -> %s" % i)
+        '''obtener el id de la activity_name '''
+        select = "SELECT id FROM geography where id='" + geography_id + "';"
+        cursor1.execute(select)
+        select_geography_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_geography_id) == 0:
+            insert = "insert into geography(id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name) values (%s, %s, %s, %s, %s, %s, %s, %s)"
+            datos = (geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name)
+            # print("%s, id: %s geography: %s,"%(i, geography_id, longitude, latitude, un_code, un_region_code, un_subregion_code, name, short_name))
+            print("%s, id: %s "%(i, geography_id))
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def unit():
+    print("unit")
     xmlReader = minidom.parse(routeMD + "Units.xml")
     units = xmlReader.getElementsByTagName("unit")
     i = 0
@@ -210,20 +221,26 @@ def unit():
                 unit_comment = "not comment provided by the provider"
         else:
             unit_comment = "not comment provided by the provider"
-        insert = "insert into unit(id, name, comment) values (%s, %s, %s)"
-        datos = (unit_id, unit_name, unit_comment)
-        print("%s, id: %s unit_name: %s,"%(i, unit_id, unit_name))
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 124 y salen -> %s" % i)
+        '''obtener el id de la activity_name '''
+        select = "SELECT id FROM unit where id='" + unit_id + "';"
+        cursor1.execute(select)
+        select_unit_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_unit_id) == 0:
+            insert = "insert into unit(id, name, comment) values (%s, %s, %s)"
+            datos = (unit_id, unit_name, unit_comment)
+            print("%s, id: %s unit_name: %s,"%(i, unit_id, unit_name))
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def system_model():
+    print("system_model")
     xmlReader = minidom.parse(routeMD + "SystemModels.xml")
     systemModels = xmlReader.getElementsByTagName("systemModel")
     i = 0
     for systemModel in systemModels:
-        unit_id = systemModel.getAttribute("id")
+        system_model_id = systemModel.getAttribute("id")
         i += 1
         if len(systemModel.getElementsByTagName("name")) != 0:
             try:
@@ -239,15 +256,21 @@ def system_model():
                 system_model_short_name = "not shortname provided by the provider"
         else:
             system_model_short_name = "not shortname provided by the provider"
-        insert = "insert into system_model(id, name, short_name) values (%s, %s, %s)"
-        datos = (unit_id, system_model_name, system_model_short_name)
-        print("%s, id: %s system_model_name: %s,"%(i, unit_id, system_model_name))
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 10 y salen -> %s" % i)
+        '''obtener el id de la activity_name '''
+        select = "SELECT id FROM system_model where id='" + system_model_id + "';"
+        cursor1.execute(select)
+        select_system_model_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_system_model_id) == 0:
+            insert = "insert into system_model(id, name, short_name) values (%s, %s, %s)"
+            datos = (system_model_id, system_model_name, system_model_short_name)
+            # print("%s, id: %s system_model_name: %s,"%(i, system_model_id, system_model_name))
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def property():
+    print("property")
     xmlReader = minidom.parse(routeMD + "Properties.xml")
     properties = xmlReader.getElementsByTagName("property")
     i = 0
@@ -265,21 +288,27 @@ def property():
                 property_name = "not name provided by the provider"
         else:
             property_name = "not name provided by the provider"
-        insert = "insert into property(id, unit_id, default_variable_name, name) values (%s, %s, %s, %s)"
-        datos = (property_id, unit_id, property_name, default_variable_name)
-        print("%s, id: %s property_name: %s,"%(i, property_id, property_name))
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 947 y salen -> %s" % i)
+        '''obtener el id de la activity_name '''
+        select = "SELECT id FROM property where id='" + property_id + "';"
+        cursor1.execute(select)
+        select_property_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_property_id) == 0:
+            insert = "insert into property(id, unit_id, default_variable_name, name) values (%s, %s, %s, %s)"
+            datos = (property_id, unit_id, property_name, default_variable_name)
+            print("%s, id: %s property_name: %s,"%(i, property_id, property_name))
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def activityIndexEntry():
+    print("activityIndexEntry")
     xmlReader = minidom.parse(routeMD + "ActivityIndex.xml")
     activityIndexEntry = xmlReader.getElementsByTagName("activityIndexEntry")
-    version = "ecoinvent 3.6_cut-off_ecoSpold02"
+    version = 24
     i = 0
     for activityIndex in activityIndexEntry:
-        id = activityIndex.getAttribute("id")
+        activity_index_id = activityIndex.getAttribute("id")
         activity_name_id = activityIndex.getAttribute("activityNameId")
         geography_id = activityIndex.getAttribute("geographyId")
         start_date = activityIndex.getAttribute("startDate")
@@ -288,18 +317,34 @@ def activityIndexEntry():
         system_model_id = activityIndex.getAttribute("systemModelId")
         i += 1
         '''obtener los rows que ya han sido ingresados para comprobar que no se repita pero que si esten todos'''
-        select = "SELECT * FROM activity_index where id='" + id + "' and activity_name_id='"+activity_name_id+"' and geography_id='"+geography_id+"' and start_date='"+start_date+"' and end_date='"+end_date+"' and special_activity_type='"+special_activity_type+"' and system_model_id='"+system_model_id+"';"
+        select = "SELECT * FROM activity_index where id='" + activity_index_id + "' and geography_id='"+geography_id+"' and start_date='"+start_date+"' and end_date='"+end_date+"' and special_activity_type='"+special_activity_type+"' and system_model_id='"+system_model_id+"';"
         cursor1.execute(select)
-        activity_index = cursor1.fetchall()
-        if len(activity_index) == 0:
-            insert = "insert into activity_index(id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version) values (%s, %s, %s, %s, %s, %s, %s, %s)"
-            datos = (id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id, version)
+        select_activity_index = cursor1.fetchall()
+        print(activity_index_id)
+        if len(select_activity_index) == 0:
+            '''SE INGRESA EN LA TABLA activity_index'''
+            insert = "insert into activity_index(id, geography_id, start_date, end_date, special_activity_type, system_model_id) values (%s, %s, %s, %s, %s, %s)"
+            datos = (activity_index_id, activity_name_id, geography_id, start_date, end_date, special_activity_type, system_model_id)
+            cursor1.execute(insert, datos)
+            '''SE INGRESA EN LA TABLA version_name_index'''
+            insert = "insert into version_name_index(activity_index_id, activity_name_id, version_id) values (%s, %s, %s, %s, %s, %s, %s)"
+            datos = (activity_index_id, activity_name_id, version)
             cursor1.execute(insert, datos)
             conexion.commit()
-    print("deben ser 35708 y salen -> %s" % i)
+        else:
+            select2 = "SELECT * FROM version_name_index where activity_index_id='" + activity_index_id + "' and activity_name_id='" + activity_name_id + "';"
+            cursor1.execute(select2)
+            select2_activity_index = cursor1.fetchall()
+            if len(select2_activity_index) == 0:
+                '''SE INGRESA EN LA TABLA version_name_index'''
+                insert = "insert into version_name_index(activity_index_id, activity_name_id, version_id) values (%s, %s, %s, %s, %s, %s, %s)"
+                datos = (activity_index_id, activity_name_id, version)
+                cursor1.execute(insert, datos)
+                conexion.commit()
     return
 
 def intermediateExchange():
+    print("intermediateExchange")
     xmlReader = minidom.parse(routeMD + "IntermediateExchanges.xml")
     intermediateExchanges = xmlReader.getElementsByTagName("intermediateExchange")
     i = 0
@@ -321,11 +366,16 @@ def intermediateExchange():
                 name = "not name provided by the provider"
         else:
             name = "not name provided by the provider"
-        insert = "insert into intermediate_exchange(id, unit_id, name) values (%s, %s, %s)"
-        datos = (id, unit_id, name)
-        cursor1.execute(insert, datos)
-        conexion.commit()
-    print("deben ser 3205 y salen -> %s" % i)
+        '''obtener el id de la activity_name '''
+        select = "SELECT id FROM intermediate_exchange where id='" + id + "';"
+        cursor1.execute(select)
+        select_intermediate_exchange_id = cursor1.fetchall()
+        '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
+        if len(select_intermediate_exchange_id) == 0:
+            insert = "insert into intermediate_exchange(id, unit_id, name) values (%s, %s, %s)"
+            datos = (id, unit_id, name)
+            cursor1.execute(insert, datos)
+            conexion.commit()
     return
 
 def ordenamientoBurbuja(matriz,tam):
@@ -345,7 +395,11 @@ def leerActividad():
     # os.rename(routeDS + "New folder/0a3b32da-3a5d-4ece-98b7-2c30fa78be34_66c93e71-f32b-4591-901c-55395db5c132.spold", routeDS+"New folder/0a3b32da-3a5d-4ece-98b7-2c30fa78be34_66c93e71-f32b-4591-901c-55395db5c132.xml")
     # os.rename(routeDS + "New folder/0b5c13c7-820e-47d3-aa39-ed2fb6612ec3_9cdb112b-0d90-4d76-9cec-412b0c67d8bb.spold", routeDS+"New folder/0b5c13c7-820e-47d3-aa39-ed2fb6612ec3_9cdb112b-0d90-4d76-9cec-412b0c67d8bb.xml")
     # os.rename(routeDS + "New folder/0b818f0b-39a8-45a8-a1b1-a3b791e1b1c6_7566f905-29c9-45d6-b2ff-65980f38e3a0.spold", routeDS+"New folder/0b818f0b-39a8-45a8-a1b1-a3b791e1b1c6_7566f905-29c9-45d6-b2ff-65980f38e3a0.xml")
-    xmlReader = minidom.parse(routeDS+"New folder/0b818f0b-39a8-45a8-a1b1-a3b791e1b1c6_7566f905-29c9-45d6-b2ff-65980f38e3a0.xml")
+
+
+    os.rename(routeDS + "New folder/000bd862-1221-4d5a-95ed-1fa465fb5c1d_d47a4435-3089-4263-af99-8611eed2698c.spold", routeDS+"New folder/000bd862-1221-4d5a-95ed-1fa465fb5c1d_d47a4435-3089-4263-af99-8611eed2698c.xml")
+
+    xmlReader = minidom.parse(routeDS+"New folder/000bd862-1221-4d5a-95ed-1fa465fb5c1d_d47a4435-3089-4263-af99-8611eed2698c.xml")
     activityDescriptions = xmlReader.getElementsByTagName("activityDescription")
     i = 0
     general_comment = ""
@@ -470,22 +524,22 @@ def leerActividad():
             #     print("ya existe")
             conexion.commit()
             i += 1
-    print("activity_person -> deben ser 16-16 y salen -> %s" % i)
     return
 
 if __name__ == "__main__":
     cursor1 = conexion.cursor()
-    # intermediateExchange()
+
     # companies()
     # sources()
     # persons()
     # activity_name()
     # geography()
     # unit()
+    # intermediateExchange()
     # system_model()
     # property()
-    # activityIndexEntry()
-    leerActividad()
+    activityIndexEntry()
+    # leerActividad()
 
     conexion.close()
 
