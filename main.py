@@ -540,7 +540,7 @@ if __name__ == "__main__":
     # property()
     activityIndexEntry()
     # leerActividad()
-
+    print("un cambio")
     conexion.close()
 
     print("end")
