@@ -13,12 +13,12 @@ from shutil import rmtree
 # conexion.commit()
 # conexion.close()
 
-routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
-# routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/MasterData/"
-routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
-routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
-routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/"
-# routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/datasets/"
+# routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
+routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/MasterData/"
+# routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
+# routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/"
+routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/"
+routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/datasets/"
 
 def companies():
     print("companies")
@@ -98,7 +98,7 @@ def sources():
         cursor1.execute(select)
         select_source_id = cursor1.fetchall()
         '''colocar validacion de si no encuentra el nombre, debe crear una nueva persona'''
-        if len(source_id) == 0:
+        if len(select_source_id) == 0:
             insert = "insert into source(id, type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             datos = (source_id, source_type, year, volume_no, first_author, additional_authors, title, names_of_editors, short_name, page_numbers, journal, title_of_anthology, place_of_publications, publisher, comment)
             cursor1.execute(insert, datos)
@@ -538,6 +538,7 @@ def leerActividadGenerica():
     #     cadena_archivo = archivo
     #     cortar = cadena_archivo.split('_')
     #     os.rename(routePrueba + "New folder 2/" + cadena_archivo, routePrueba + "New folder 2/" + str(cortar[0]) + ".xml")
+    print("COMIENZA EL PROCESO")
     for archivo in os.listdir(routePrueba + "New folder 2/"):
         # shutil.copy(routeDS + archivo, routePrueba + "New folder 2/")
         # print(os.path.join(routeMD, archivo))
@@ -697,7 +698,7 @@ def leerActividadGenerica():
                 #     print("ya existe")
                 conexion.commit()
                 i += 1
-    # rmtree(routePrueba + "New folder 2")
+    rmtree(routePrueba + "New folder 2")
 
     return
 
