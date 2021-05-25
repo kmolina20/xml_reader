@@ -13,12 +13,12 @@ from shutil import rmtree
 # conexion.commit()
 # conexion.close()
 
-# routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
-routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/MasterData/"
-# routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
-# routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/"
-routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/"
-routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/datasets/"
+routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/MasterData/"
+# routeMD = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/MasterData/"
+routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/datasets/"
+# routeDS = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/datasets/"
+routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.6/ecoinvent 3.6_cut-off_ecoSpold02/"
+# routePrueba = "/home/kamila/Python/ECOINVENT_ROOT/3.7.1/ecoinvent 3.7.1_cutoff_ecoSpold02/"
 
 def companies():
     print("companies")
@@ -337,7 +337,7 @@ def activityIndexEntry():
             cursor1.execute(insert, datos2)
             conexion.commit()
         else:
-            select2 = "SELECT * FROM version_name_index where activity_index_id='" + activity_index_id + "' and activity_name_id='" + activity_name_id + "';"
+            select2 = "SELECT * FROM version_name_index where activity_index_id='" + activity_index_id + "' and activity_name_id='" + activity_name_id + "' and version_id='"+str(version)+"';"
             cursor1.execute(select2)
             select2_activity_index = cursor1.fetchall()
             if len(select2_activity_index) == 0:
@@ -531,26 +531,18 @@ def leerActividad():
 def leerActividadGenerica():
     """data_generator_and_publication - activity - acitivity_intermediate_exchange - activity_person"""
     cadena_archivo = ""
-    # os.mkdir(routePrueba + "New folder 2")
-    # for archivo in os.listdir(routeDS):
-    #     shutil.copy(routeDS + archivo, routePrueba + "New folder 2/")
-    # for archivo in os.listdir(routePrueba + "New folder 2/"):
-    #     cadena_archivo = archivo
-    #     cortar = cadena_archivo.split('_')
-    #     os.rename(routePrueba + "New folder 2/" + cadena_archivo, routePrueba + "New folder 2/" + str(cortar[0]) + ".xml")
+    os.mkdir(routePrueba + "New folder 2")
+    for archivo in os.listdir(routeDS):
+        shutil.copy(routeDS + archivo, routePrueba + "New folder 2/")
+    print("renombrando archivos")
+    for archivo in os.listdir(routePrueba + "New folder 2/"):
+        cadena_archivo = archivo
+        cortar = cadena_archivo.split('_')
+        os.rename(routePrueba + "New folder 2/" + cadena_archivo, routePrueba + "New folder 2/" + str(cortar[0]) + ".xml")
     print("COMIENZA EL PROCESO")
     for archivo in os.listdir(routePrueba + "New folder 2/"):
-        # shutil.copy(routeDS + archivo, routePrueba + "New folder 2/")
-        # print(os.path.join(routeMD, archivo))
         print(os.path.join(archivo))
-        # cadena_archivo = archivo
-        # print("cadena_archivo> %s" % cadena_archivo)
-        # spold = cadena_archivo.split('.')
-        # cortar = cadena_archivo.split('_')
-        # print(cortar)
-        # os.rename(routePrueba + "New folder 2/" + cadena_archivo, routePrueba + "New folder 2/" + str(cortar[0]) + ".xml")
         xmlReader = minidom.parse(routePrueba + "New folder 2/"+archivo)
-        # xmlReader = minidom.parse(routeDS + "New folder 2/"+cortar[0])
 
         activityDescriptions = xmlReader.getElementsByTagName("activityDescription")
         i = 0
@@ -559,6 +551,22 @@ def leerActividadGenerica():
         for activityDescription in activityDescriptions:
             for activity in activityDescription.getElementsByTagName("activity"):
                 activity_index_id = activity.getAttribute("id")
+                '''AGREGAR SYNONYMS DE LAS ACTIVIDADES'''
+                if len(activity.getElementsByTagName("synonym")) != 0:
+                    try:
+                        j = 0
+                        for syno in activity.getElementsByTagName("synonym"):
+                            aux = activity.getElementsByTagName("synonym")[j].firstChild.nodeValue
+                            insert = "insert into synonym(activity_id, synonym) values (%s, %s)"
+                            datos = (activity_index_id, aux)
+                            cursor1.execute(insert, datos)
+                            conexion.commit()
+                            j += 1
+                    except AttributeError:
+                        aux = "not synonym provided"
+                else:
+                    aux = "not comment provided"
+                '''HASTA AQUI LOS SYNONYMS'''
                 if len(activity.getElementsByTagName("allocationComment")) != 0:
                     try:
                         allocation_comment = property.getElementsByTagName("allocationComment")[0].firstChild.data
@@ -656,13 +664,27 @@ def leerActividadGenerica():
                 # id = intermediateExchange.getAttribute("id")
                 intermediate_exchange_id = intermediateExchange.getAttribute("intermediateExchangeId")
                 variable_name = intermediateExchange.getAttribute("variableName")
+                if len(intermediateExchange.getElementsByTagName("inputGroup")) != 0:
+                    try:
+                        input_group = intermediateExchange.getElementsByTagName("inputGroup")[0].firstChild.data
+                    except AttributeError:
+                        input_group = "No Group"
+                else:
+                    input_group = "No Group"
+                if len(intermediateExchange.getElementsByTagName("outputGroup")) != 0:
+                    try:
+                        output_group = intermediateExchange.getElementsByTagName("outputGroup")[0].firstChild.data
+                    except AttributeError:
+                        output_group = "No Group"
+                else:
+                    output_group = "No Group"
                 i += 1
                 '''debe buscar el ultimo id ingresado, ahora se manda el 1 pero debe buscar el ultimo id ingresado enla tabla activity'''
                 select = "SELECT MAX(id) AS id FROM activity"
                 cursor1.execute(select)
                 activity_id = cursor1.fetchall()
-                insert = "insert into acitivity_intermediate_exchange(activity_id, intermediate_exchange_id, variable_name) values (%s, %s, %s)"
-                datos = (activity_id[0], intermediate_exchange_id, variable_name)
+                insert = "insert into acitivity_intermediate_exchange(activity_id, intermediate_exchange_id, variable_name, input_group, output_group) values (%s, %s, %s, %s, %s)"
+                datos = (activity_id[0], intermediate_exchange_id, variable_name, input_group, output_group)
                 cursor1.execute(insert, datos)
                 conexion.commit()
         print("acitivity_intermediate_exchange -> deben ser 15-42 y salen -> %s" % i)
@@ -736,10 +758,11 @@ if __name__ == "__main__":
     # intermediateExchange()
     # system_model()
     # property()
+    '''cambiar el id de la version si se cambia'''
     # activityIndexEntry()
     # leerActividad()
     '''esta es la buena'''
-    # leerActividadGenerica()
+    leerActividadGenerica()
 
     conexion.close()
 
