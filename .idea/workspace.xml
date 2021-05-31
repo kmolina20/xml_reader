@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="816e6ba2-2531-4777-a54d-61fd58745a82" name="Default Changelist" comment="todo funcional con la version 3.6 cut-off">
+    <list default="true" id="816e6ba2-2531-4777-a54d-61fd58745a82" name="Default Changelist" comment="funcional y validado">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -80,7 +80,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621656105053</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="funcional y validado">
+      <created>1621902601145</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1621902601145</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -97,6 +104,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="todo funcional con la version 3.6 cut-off" />
-    <option name="LAST_COMMIT_MESSAGE" value="todo funcional con la version 3.6 cut-off" />
+    <MESSAGE value="funcional y validado" />
+    <option name="LAST_COMMIT_MESSAGE" value="funcional y validado" />
   </component>
 </project>
