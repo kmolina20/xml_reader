@@ -11,7 +11,7 @@ try:
     credenciales = {
         "dbname": "db_metadata",
         "user": "postgres",
-        "password": "1234",
+        "password": "root",
         "host": "localhost",
         "port": 5432
     }

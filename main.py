@@ -1,6 +1,6 @@
 from builtins import print
 from xml.dom import minidom
-from conection import conexion
+from connection import conexion
 import os
 import numpy as np
 import shutil
@@ -756,20 +756,20 @@ def leerActividadGenerica():
 if __name__ == "__main__":
     cursor1 = conexion.cursor()
 
-    companies()
-    sources()
-    persons()
-    activity_name()
-    geography()
-    unit()
-    intermediateExchange()
-    system_model()
-    property()
+    #companies()
+    #sources()
+    #persons()
+    #activity_name()
+    #geography()
+    #unit()
+    #intermediateExchange()
+    #system_model()
+    #property()
     '''cambiar el id de la version si se cambia'''
-    activityIndexEntry()
+    #activityIndexEntry()
     # leerActividad()
     '''esta es la buena'''
-    leerActividadGenerica()
+    #leerActividadGenerica()
 
     conexion.close()
 
